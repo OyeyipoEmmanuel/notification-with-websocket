@@ -1,9 +1,7 @@
-import { useRef, useState } from "react";
+import {useState } from "react";
 import { dummyTweets } from "../../datas/dummyTweets"
 import { IoMdHeart } from "react-icons/io";
 import { IoMdHeartEmpty } from "react-icons/io";
-
-import { FaHeart } from "react-icons/fa";
 
 
 const Tweets = () => {
@@ -11,9 +9,6 @@ const Tweets = () => {
   
 
   //Like tweet
-  const [tweetLiked, setTweetLiked] = useState<boolean>(false)
-
-
   const handleLikeTweet = (idx: number): void => {
     setTweets(prev =>
       prev.map((tweet, i) =>
@@ -25,8 +20,6 @@ const Tweets = () => {
 
       )
     )
-
-    setTweetLiked(prev => !prev)
 
   }
 
