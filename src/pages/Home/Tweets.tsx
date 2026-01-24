@@ -1,27 +1,61 @@
-import {useState } from "react";
+import { useEffect, useState } from "react";
 import { dummyTweets } from "../../datas/dummyTweets"
 import { IoMdHeart } from "react-icons/io";
 import { IoMdHeartEmpty } from "react-icons/io";
+import { socket } from "../../service/notificationSocket";
 
 
 const Tweets = () => {
   const [tweets, setTweets] = useState(dummyTweets)
-  
+  const [dataFromWS, setDataFromWS] = useState<any>("")
+
+  useEffect(() => {
+    //Connect to socket
+    socket.connect()
+
+    //authenticate and pass like
+    socket.on("connect", () => {
+      socket.emit("auth", { userId: "user1" })
+
+      socket.emit("like", {
+        targetUserId: "user1",
+        fromUser: "emmanuel"
+      })
+    })
+
+    //listin for notification
+    // const onNotif = (n: string) => {
+    //   console.log(n);
+    // }
+
+    socket.on("notification:new",  (n: string) => {
+      console.log(n);
+    })
+
+    return () => {
+      socket.off("notification:new",  (n: string) => {
+      console.log(n);
+    });
+      socket.disconnect();
+    };
+  }, [])
+
 
   //Like tweet
-  const handleLikeTweet = (idx: number): void => {
+  const handleLikeTweet = (idx: number) => {
     setTweets(prev =>
       prev.map((tweet, i) =>
-        i === idx ? {
-          ...tweet,
-          liked: !tweet.liked,
-          likes: tweet.liked ? tweet.likes-- : tweet.likes++
-        } : tweet
-
+        i === idx
+          ? {
+            ...tweet,
+            liked: !tweet.liked,
+            likes: tweet.liked ? tweet.likes-- : tweet.likes++,
+          }
+          : tweet
       )
-    )
+    );
+  };
 
-  }
 
   return (
     <main className="">
@@ -48,7 +82,7 @@ const Tweets = () => {
               {
                 !tweet.liked
                   ?
-                  <IoMdHeartEmpty className="text-2xl text-gray-400 cursor-pointer" onClick={() => handleLikeTweet(idx)}/>
+                  <IoMdHeartEmpty className="text-2xl text-gray-400 cursor-pointer" onClick={() => handleLikeTweet(idx)} />
                   :
                   <IoMdHeart className="text-2xl text-red-600 cursor-pointer hover:animate-[ping_0.2s_ease-out_1]" onClick={() => handleLikeTweet(idx)} />
 
